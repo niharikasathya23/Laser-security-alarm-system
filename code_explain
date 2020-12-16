@@ -1,0 +1,30 @@
+# Laser-security-alarm-system
+Laser security alarm system aims at protecting our homes, offices, banks, lockers etc from intrusion and unauthorised access by alerting the user through sms and buzzer alarm.
+Code Explanation
+Now to send an SMS, we will create an object of the same.
+sms = Sms(conf.SID, conf.AUTH_TOKEN, conf.TO_NUMBER, conf.FROM_NUMBER)
+The above code will automatically fetch your SID, AUTH_TOKEN, TO_NUMBER and FROM_NUMBER that you have initialized in conf.py file. Make sure you have given correct value in conf.py file.
+
+Since we want to continuously monitor the LDR reading, we will enclose our logic to fetch, compare and send the SMS inside an infinite loop using the `while True:` statement. An infinite loop is a special loop which executes its code continuously since its exit condition is never going to be valid. To exit the loop, we will need to forcibly exit the code by holding CTRL + C.
+
+The code continuously fetches the LDR value using `analogRead` function. Since the sensor is connected to A0 pin of the Bolt, we will execute the analogRead() function on the pin A0.
+The response from the Bolt Cloud using the analogRead() function is in a JSON format, so we will need to load the JSON data sent by the cloud using Python's json library.
+The LDR value is inside a field labelled as "value" in the response. We can access the JSON values using the statement `sensor_value = int(data['value'])`. This line also converts the sensor reading to integer data type for comparing the LDR range.
+This is enclosed inside a try-except block to handle any error that may occur in the code. More explanation of try-except code block is given here.
+The next line of code checks if the LDR reading is above the maximum limit or below the minimum limit. If it exceeds, then the SMS will be sent.
+The SMS to be sent will contain the text "The Current LDR sensor value is" followed by the LDR value.
+The response from Twilio will be stored inside the `response` variable.
+Once the LDR reading has been sent, we will need to wait for 4 seconds to get the next reading. For this, we will put the program to sleep once every loop iteration.
+The statement `time.sleep(4)` puts the program execution on hold for 4 seconds. This means that the program would not execute for a period of 4 seconds.
+In the above code, we are fetching the data every 4 sec. You can change the value but ideally, it should be good if the time interval between 2 data points is more than 4sec.
+
+
+LDR=(40*sensor_value)/424 
+Where sensor_value is the variable in which data obtained from the LM35 sensor is stored.
+
+Save the file. Time to run the code. To do so type `sudo python3 laser.py` in terminal
+Please note that SMS delivery via a trial Twilio account is NOT guaranteed to be instant by Twilio. Also, note that SMS will NOT be sent to numbers which have DND(Do Not Disturb) turned ON. It usually takes a few minutes for your SMS to be sent to your mobile number. Please check the logs on Twilio if you are not receiving the SMS even if the LDR exceeds the threshold.
+
+Since we have written a couple of print statement in the code. So the LDR data will get printed on the terminal. If that value falls outside the threshold range then SMS will be sent to your registered number. The screenshot for the SMS sent is given below:
+
+
